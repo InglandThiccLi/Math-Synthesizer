@@ -1,0 +1,99 @@
+.piano-wrap {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.piano {
+    position: relative;
+    height: 180px;
+    max-width: 100%;
+    margin-top: 6px;
+    background: #2c3e50;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+.piano.touch {
+    margin-top: 0;
+    height: 100%;
+    padding: 4px 10px;
+    background: #aae4e6;
+}
+
+.white {
+    position: relative;
+    display: inline-block;
+    width: calc(100% / 22);
+    height: 100%;
+    border: 1px solid #222;
+    background: linear-gradient(to bottom, #fff 0%, #eee 100%);
+    box-sizing: border-box;
+    vertical-align: top;
+    text-align: center;
+    line-height: 160px;
+    font-weight: 600;
+    color: #111;
+    border-radius: 0 0 5px 5px;
+}
+
+.white.active {
+    background: linear-gradient(to bottom, #ff9d9d 0%, #ff6b6b 100%);
+    transform: translateY(2px);
+}
+
+.black {
+    position: absolute;
+    height: 110px;
+    width: calc(100%/36);
+    background: linear-gradient(to bottom, #000 0%, #333 100%);
+    top: 0;
+    z-index: 2;
+    border-radius: 4px;
+    color: #fff;
+    text-align: center;
+    line-height: 90px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 0 0 4px 4px;
+}
+
+.black.active {
+    background: linear-gradient(to bottom, #b30000 0%, #800000 100%);
+    transform: translateY(2px);
+}
+
+.key.touch {
+    background-color: white;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    gap: 1px;
+    border-radius: 10px;
+    width: 14%;
+    margin: calc(14%/16);
+}
+
+.key.touch.active {
+    background: linear-gradient(to bottom, #82bfff 0%, #9a92fc 100%);
+    transform: translateY(2px);
+}
+
+.key-label {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 25%;
+    text-align: center;
+    vertical-align: bottom;
+    font-weight: bold;
+    line-height: 10px;
+    font-size: 1vw;
+}
+
+.keyboard-hint {
+    width: 100%;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #888888;
+}

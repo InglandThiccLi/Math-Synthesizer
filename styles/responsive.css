@@ -1,0 +1,259 @@
+@media (max-width: 992px) {
+    #title {
+        justify-content: center;
+    }
+
+    #octCol {
+        width: 35%;
+    }
+
+    #octCol .btn-group {
+        width: 70%;
+    }
+
+    #octCol .btn-group label {
+        width: 20%;
+        padding: 2%;
+    }
+
+    #volCol, #pitCol {
+        width: 25%;
+    }
+
+    #showPianoBtn {
+        width: 75%;
+    }
+}
+
+@media (max-width: 768.98px) {
+    .modal {
+        overflow-y: auto;
+    }
+
+    #modal-switch .btn-group {
+        width: 100%;
+        border-radius: 0;
+    }
+	
+	.modal-body .container-fluid .row {
+        flex-direction: column;
+    }
+
+    .modal-fullscreen-md-down .main-modal-content {
+        height: 96%;
+    }
+      
+    .col-md-3 {
+        border-right: none;
+        border-bottom: 1px solid #dee2e6;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+      
+    .nav {
+        flex-direction: row !important;
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+      
+    .help-nav-item {
+        white-space: nowrap;
+        border-bottom: none;
+        border-right: 1px solid #dee2e6;
+		min-width: 120px;
+    }
+
+    #importBtn, #exportBtn{
+        height: 25% !important;
+    }
+
+    #instrumentListContainer,
+    #waveCol,
+    #varsBtn,
+    #adsrBtn,
+    #imexBtn,
+    #downBtn {
+        display: none !important;
+    }
+
+    #instrumentDropdownContainer,
+    #waveBtn2 {
+        display: flex !important;
+    }
+
+    #octCol {
+        width: 100%;
+    }
+
+    #volCol, #pitCol {
+        width: 100%;
+    }
+	
+	#support {
+		display: none;
+	}
+	
+	#support-small {
+		display: flex !important;
+	}
+}
+
+@media (max-width:576px) {
+    body {
+        padding-top: 0;
+    }
+
+    .container {
+        border-radius: 0;
+        min-height: 100vh;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    .white {
+        line-height: 120px;
+    }
+
+    .black {
+        line-height: 65px;
+    }
+
+    .form-check-inline {
+        margin-right: 0px;
+    }
+		
+    #octCol {
+        padding: 0;
+    }
+
+    #volCol, #pitCol {
+        padding: 0;
+    }
+
+    #piano-row {
+        height: auto;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+	body {
+		background: #000;
+		color: #eee;
+		scrollbar-color: #555 #222;
+	}
+	
+	.container {
+		background-color: #222;
+	}
+	
+	.dropdown-menu {
+		background-color: #333;
+		color: #eee;
+	}
+	
+	.dropdown-item {
+		color: #eee;
+	}
+	
+	.dropdown-header {
+		color: #aaa;
+	}
+	
+	.modal {
+		--bs-modal-bg: #222;
+	}
+	
+	.modal-header {
+		border-color: #aaa;
+	}
+	
+	.modal-footer {
+		border-color: #aaa;
+	}
+	
+	.text-muted {
+		color: #aaa !important;
+	}
+	
+	.list-group-item-action {
+		color: #eee;
+		background-color: #333;
+		border-color: #aaa;
+	}
+	
+	.list-group-item-action:hover {
+		color: #eee;
+		background-color: #555;
+		border-color: #aaa;
+	}
+	
+	.input-group-text {
+		color: #eee;
+		background-color: #555;
+		border-color: #aaa;
+	}
+	
+	.btn-close {
+		background-color: #eee;
+	}
+	
+	.btn-close:hover {
+		background-color: #ddd;
+	}
+	
+	.piano.touch {
+		background-color: #333 !important;
+	}
+	
+	.key.touch {
+		color: #eee;
+		background-color: #555 !important;
+	}
+	
+	.card {
+		background-color: #555;
+	}
+	
+	.card-header {
+		color: #eee;
+		background-color: #333;
+	}
+	
+	.card-body {
+		color: #eee;
+		background-color: #222;
+	}
+	
+	.help-nav-item {
+		color: #eee !important;
+	}
+	
+	.help-nav-item:hover {
+		color: #eee !important;
+		background-color: #555 !important;
+	}
+
+	.help-btn {
+		color: rgb(113, 158, 182);
+	}
+	
+	.github {
+        filter: brightness(500%);
+    }
+	
+	#title {
+		color: #d3c1af;
+	}
+	
+	#instrumentList span {
+		background-color: #333;
+	}
+	
+	#instrumentList span:hover {
+		background-color: #555;
+	}
+
+	#varsDisplay span {
+		background-color: #624;
+	}
+}

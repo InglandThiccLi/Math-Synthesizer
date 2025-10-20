@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Math Synthesizer</title>
+	<link rel="icon" type="image/png" href="images/favicon.png" />
+
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css" rel="stylesheet">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Jersey+10&family=Quicksand:wght@300..700&display=swap"
+		rel="stylesheet">
+	
+	<link href="styles/main.css" rel="stylesheet">
+	<link href="styles/responsive.css" rel="stylesheet">
+	<link href="styles/piano.css" rel="stylesheet">
+	<link href="styles/wave.css" rel="stylesheet">
+	<link href="styles/modal.css" rel="stylesheet">
+
+	<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.5.0/math.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+
+<body>
+	<div class="container py-3">
+		<div class="row mb-2">
+			<div id="title-container" class="d-flex">
+				<h4 id="title" class="col-10"><b>Math Synthesizer</b> 
+					<i id="helpBtn" class="bi bi-question-circle-fill help-btn" data-bs-toggle="modal" data-bs-target="#helpModal"></i>
+				</h4>
+				<div id="support-small" class="d-flex col-2 gap-2 d-none">
+					<div class="text-center">
+						<a href="https://github.com/InglandThiccLi" target="_blank"><img class="github" width="20px" height="20px" src="images/github-mark.svg" onerror="this.src='images/github-mark.png'" alt="View Source Code"></a>
+					</div>
+					<div class="text-center">
+						<a href='https://ko-fi.com/V7V31LFVQZ' target='_blank'><img height='20' style='border:0px;height:20px;' src='images/kofi_symbol.png' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-1 justify-content-center">
+			<div id="exprCol" class="col-12">
+				<input id="expr" class="form-control" type="text"
+					placeholder="Enter expression (use t and f). Examples: sin(f*t) | exp(-t)*tan(f*t) | sin(f*t*v1)"
+					value="sin(f*t)" disabled>
+			</div>
+			<div id="varsDisplay" class="row">
+				<small class="text-muted" >No variables defined.</small>
+			</div>
+		</div>
+
+		<div class="row mb-2">
+			<div id="instrumentListContainer" class="col-8">
+				<div class="d-flex align-items-baseline">
+					<label id="instrumentListLabel" class="form-label me-2">Instruments:</label>
+					<div id="instrumentList" class="d-flex">
+						<span class="active" instrument="Sine" expr="sin(f*t)" vars="" adsr="">Sine</span>
+						<span instrument="Sawtooth" expr="0.5*atan(tan(0.5*f*t))" vars="" adsr="">Sawtooth</span>
+						<span instrument="Square" expr="0.5*sign(sin(f*t))" vars="" adsr="">Square</span>
+						<span instrument="Triangle" expr="asin(sin(f*t))" vars="" adsr="">Triangle</span>
+						<span instrument="Harmonics" expr="(1-r)*sin(f*t)+r*sin(2*f*t)" vars="r=0.5" adsr="">Harmonics</span>
+						<span instrument="Exp Decay" expr="exp(-k*freq*t)*sin(f*t)" vars="k=0.004" adsr="">Exp Decay</span>
+						<span instrument="FM Synth" expr="cos(mu*sin(m*f*t)+c*f*t)" vars="mu=1,m=2,c=1" adsr="">FM Synth</span>
+						<span instrument="AM Synth" expr="(1+mu*cos(m*f*t))*cos(c*f*t)" vars="mu=1,m=2,c=1" adsr="">AM Synth</span>
+						<span instrument="Organ" expr="m*(a*sin(h1*f*t)+b*sin(h2*f*t)+c*sin(h3*f*t))" vars="m=0.2,a=3,b=2,c=1,h1=1,h2=2,h3=4" adsr="0.2,0.0,1.0,0.5">Organ</span>
+						<span instrument="Harp" expr="exp(-k*freq*t)*sin(f*t+exp(-4*k*freq*t)*cos(4*f*t)+exp(-2*k*freq*t)*cos(2*f*t))" vars="k=0.004" adsr="0.01,0.14,0.91,0.69">Harp</span>
+					</div>
+				</div>
+			</div>
+			<div id="instrumentDropdownContainer" class="d-none btn-group col-6">
+				<button id="instrumentDropdownTitle" type="button" class="btn btn-info dropdown-toggle"
+					data-bs-toggle="dropdown" aria-expanded="false" disabled>
+					Sine
+				</button>
+				<ul id="instrumentDropdownList" class="dropdown-menu dropdown-menu-end">
+					<h6 class="dropdown-header">Default Instruments</h6>
+					<li class="dropdown-item active" instrument="Sine" expr="sin(f*t)" vars="" adsr="">Sine</li>
+					<li class="dropdown-item" instrument="Sawtooth" expr="0.5*atan(tan(0.5*f*t))" vars="" adsr="">Sawtooth</li>
+					<li class="dropdown-item" instrument="Square" expr="0.5*sign(sin(f*t))" vars="" adsr="">Square</li>
+					<li class="dropdown-item" instrument="Triangle" expr="asin(sin(f*t))" vars="" adsr="">Triangle</li>
+					<li class="dropdown-item" instrument="Harmonics" expr="(1-r)*sin(f*t)+r*sin(2*f*t)" vars="r=0.5" adsr="">Harmonics</li>
+					<li class="dropdown-item" instrument="Exp Decay" expr="exp(-k*freq*t)*sin(f*t)" vars="k=0.004" adsr="">Exp Decay</li>
+					<li class="dropdown-item" instrument="FM Synth" expr="cos(mu*sin(m*f*t)+c*f*t)" vars="mu=1,m=2,c=1" adsr="">FM Synth</li>
+					<li class="dropdown-item" instrument="AM Synth" expr="(1+mu*cos(m*f*t))*cos(c*f*t)" vars="mu=1,m=2,c=1" adsr="">AM Synth</li>
+					<li class="dropdown-item" instrument="Organ" expr="m*(a*sin(h1*f*t)+b*sin(h2*f*t)+c*sin(h3*f*t))" vars="m=0.2,a=3,b=2,c=1,h1=1,h2=2,h3=4" adsr="0.2,0.0,1.0,0.5">Organ</li>
+					<li class="dropdown-item" instrument="Harp" expr="exp(-k*freq*t)*sin(f*t+exp(-4*k*freq*t)*cos(4*f*t)+exp(-2*k*freq*t)*cos(2*f*t))" vars="k=0.004" adsr="0.01,0.14,0.91,0.69">Harp</li>
+					<div class="dropdown-divider"></div>
+					<h6 class="dropdown-header">Custom Instruments</h6>
+				</ul>
+			</div>
+			<div id="funcCol" class="col">
+				<div class="d-flex justify-content-evenly text-center">
+					<button type="button" id="instBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+						data-bs-target="#modal" disabled><i class="bi bi-music-note-list"></i></button>
+					<button type="button" id="varsBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+						data-bs-target="#modal" disabled><i class="bi bi-alphabet"></i></button>
+					<button type="button" id="adsrBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+						data-bs-target="#modal" disabled><i class="bi bi-sliders2"></i></button>
+					<button type="button" id="imexBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+						data-bs-target="#modal" disabled><i class="bi bi-arrow-left-right"></i></button>
+					<button type="button" id="downBtn" class="btn btn-success btn-sm" data-bs-toggle="modal"
+						data-bs-target="#modal" disabled><i class="bi bi-download"></i></button>
+					<button type="button" id="waveBtn2" class="btn btn-success btn-sm d-none waveBtn" disabled>
+						<i class="bi bi-soundwave"></i></button>
+				</div>
+			</div>
+		</div>
+
+		<div class="row mb-2">
+			<div id="octCol" class="col-5 d-flex justify-content-evenly text-center" role="group">
+				<label>Octave:</label>
+				<div class="btn-group">
+					<input type="radio" class="btn-check" name="octave" id="octave0" autocomplete="off" value="0" disabled>
+					<label class="btn btn-outline-primary" for="octave0">0</label>
+					<input type="radio" class="btn-check" name="octave" id="octave1" autocomplete="off" value="1" disabled>
+					<label class="btn btn-outline-primary" for="octave1">1</label>
+					<input type="radio" class="btn-check" name="octave" id="octave2" autocomplete="off" value="2" disabled>
+					<label class="btn btn-outline-primary" for="octave2">2</label>
+					<input type="radio" class="btn-check" name="octave" id="octave3" autocomplete="off" value="3" checked disabled>
+					<label class="btn btn-outline-primary" for="octave3">3</label>
+					<input type="radio" class="btn-check" name="octave" id="octave4" autocomplete="off" value="4" disabled>
+					<label class="btn btn-outline-primary" for="octave4">4</label>
+					<input type="radio" class="btn-check" name="octave" id="octave5" autocomplete="off" value="5" disabled>
+					<label class="btn btn-outline-primary" for="octave5">5</label>
+					<input type="radio" class="btn-check" name="octave" id="octave6" autocomplete="off" value="6" disabled>
+					<label class="btn btn-outline-primary" for="octave6">6</label>
+				</div>
+			</div>
+			<div id="volCol" class="col-3 d-flex justify-content-evenly text-center">
+				<span>Volume</span>
+				<input id="volume" class="form-range" type="range" min="0" max="1" step="0.01" value="1" disabled></input>
+				<span id="volumeText">100%</span>
+			</div>
+			<div id="pitCol" class="col-3 d-flex justify-content-evenly text-center">
+				<span>A4 Pitch</span>
+				<input id="pitch" class="form-range" type="range" min="415" max="466" step="1" value="440" disabled></input>
+				<span id="pitchText">440Hz</span>
+			</div>
+			<div id="waveCol" class="col d-flex justify-content-evenly text-center">
+				<button id="waveBtn1" type="button" class="btn btn-success btn-sm" disabled><i class="bi bi-soundwave"></i></button>
+			</div>
+		</div>
+
+		<div class="row mt-3" id="waveVisualizerRow" style="display: none;">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-header d-flex justify-content-between align-items-center">
+						<h5 class="mb-0">Waveform Visualizer</h5>
+					</div>
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center mb-2">
+							<small class="text-muted">Scroll/pinch to zoom • Drag to pan</small>
+							<div>
+								<button type="button" class="btn btn-secondary btn-sm" id="resetZoomBtn">
+									Reset
+								</button>
+							</div>
+						</div>
+						<canvas id="waveCanvas" width="800" height="200" 
+								style="width: 100%; height: 200px; background: #f8f9fa; border-radius: 4px; cursor: crosshair;">
+						</canvas>
+						<div class="d-flex justify-content-between mt-2">
+							<small id="timeRange">Time range: 0 to 1 s</small>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div class="controls col justify-content-center">
+				<button id="showPianoBtn" class="btn btn-primary"><i class="bi bi-play-circle-fill"></i> Turn On</button>
+			</div>
+		</div>
+
+		<div id="piano-row" class="row">
+			<div class="col piano-wrap">
+				<div id="piano" class="piano" style="display:none">
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal -->
+		<div class="modal" id="modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+			<div id="modal-switch" class="d-flex">
+				<div class="btn-group">
+					<input type="radio" class="btn-check" name="modal-switch" id="instModalSwitch" autocomplete="off" checked>
+					<label class="btn btn-outline-primary" for="instModalSwitch"><i class="bi bi-music-note-list"></i></label>
+					<input type="radio" class="btn-check" name="modal-switch" id="varsModalSwitch" autocomplete="off">
+					<label class="btn btn-outline-primary" for="varsModalSwitch"><i class="bi bi-alphabet"></i></label>
+					<input type="radio" class="btn-check" name="modal-switch" id="adsrModalSwitch" autocomplete="off">
+					<label class="btn btn-outline-primary" for="adsrModalSwitch"><i class="bi bi-sliders2"></i></label>
+					<input type="radio" class="btn-check" name="modal-switch" id="imexModalSwitch" autocomplete="off">
+					<label class="btn btn-outline-primary" for="imexModalSwitch"><i class="bi bi-floppy"></i></label>
+					<input type="radio" class="btn-check" name="modal-switch" id="downModalSwitch" autocomplete="off">
+					<label class="btn btn-outline-primary" for="downModalSwitch"><i class="bi bi-download"></i></label>
+				</div>
+			</div>
+			<div class="modal-dialog modal-lg modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable">
+				<div id="instModal" class="modal-content main-modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Instruments</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-header">
+						<h2 id="currentInstrument" class="modal-title fs-6">Current Instrument: Sine</h2>
+						<div class="btn-group btn-group-sm" role="group">
+							<input type="radio" class="btn-check" name="instTypeSwitch" id="builtInInstBtn"
+								autocomplete="off" checked>
+							<label class="btn btn-outline-primary" for="builtInInstBtn">Built-in</label>
+							<input type="radio" class="btn-check" name="instTypeSwitch" id="customInstBtn"
+								autocomplete="off">
+							<label class="btn btn-outline-primary" for="customInstBtn">Custom</label>
+						</div>
+					</div>
+					<div id="builtInInsts" class="modal-body">
+						<div class="list-group">
+							<button id="instrument-Sine"
+								class="instrument list-group-item list-group-item-action active" aria-current="true"
+								instrument="Sine" expr="sin(f*t)" vars="" adsr="">
+								Sine
+							</button>
+							<button id="instrument-Sawtooth"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Sawtooth" expr="0.5*atan(tan(0.5*f*t))" vars="" adsr="">
+								Sawtooth
+							</button>
+							<button id="instrument-Square"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Square" expr="0.5*sign(sin(f*t))" vars="" adsr="">
+								Square
+							</button>
+							<button id="instrument-Triangle"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Triangle" expr="asin(sin(f*t))" vars="" adsr="">
+								Triangle
+							</button>
+							<button id="instrument-Harmonics"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Harmonics" expr="(1-r)*sin(f*t)+r*sin(2*f*t)" vars="r=0.5" adsr="">
+								Harmonics
+							</button>
+							<button id="instrument-Exp-Decay"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Exp Decay" expr="exp(-k*freq*t)*sin(f*t)" vars="k=0.004" adsr="">
+								Exp Decay
+							</button>
+							<button id="instrument-FM-Synth"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="FM Synth" expr="cos(mu*sin(m*f*t)+c*f*t)" vars="mu=1,m=2,c=1" adsr="">
+								FM Synth
+							</button>
+							<button id="instrument-AM-Synth"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="AM Synth" expr="(1+mu*cos(m*f*t))*cos(c*f*t)" vars="mu=1,m=2,c=1" adsr="">
+								AM Synth
+							</button>
+							<button id="instrument-Organ"
+								class="instrument list-group-item list-group-item-action" aria-current="false"
+								instrument="Organ" expr="m*(a*sin(h1*f*t)+b*sin(h2*f*t)+c*sin(h3*f*t))" vars="m=0.2,a=3,b=2,c=1,h1=1,h2=2,h3=4" adsr="0.2,0.0,1.0,0.5">
+								Organ
+							</button>
+							<button id="instrument-Harp" 
+								class="instrument list-group-item list-group-item-action" aria-current="false" 
+								instrument="Harp" expr="exp(-k*freq*t)*sin(f*t+exp(-4*k*freq*t)*cos(4*f*t)+exp(-2*k*freq*t)*cos(2*f*t))" vars="k=0.004" adsr="0.01,0.14,0.91,0.69">
+								Harp
+							</button>
+						</div>
+					</div>
+					<div id="customInsts" class="d-none modal-body">
+						<div class="list-group">
+							
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="addInstBtn" type="button" class="btn btn-primary">Add Instrument</button>
+						<button id="addInstDoneBtn" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+				<div id="varsModal" class="modal-content main-modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Variables</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-header">
+						<input id="exprInModal" class="form-control" type="text"
+							placeholder="Enter expression (use t and f). Examples: sin(f*t) | exp(-t)*tan(f*t) | sin(f*t*v1)"
+							value="">
+						<button id="waveBtnInModal" type="button" class="btn btn-success btn-sm"><i class="bi bi-soundwave"></i></button>
+					</div>
+					<div class="modal-header">
+						<div class="row" id="waveVisualizerRowInModal" style="display: none;">
+							<div class="col-12">
+								<div class="card">
+									<div class="card-header d-flex justify-content-between align-items-center">
+										<h5 class="mb-0">Waveform Visualizer</h5>
+									</div>
+									<div class="card-body">
+										<div class="d-flex justify-content-between align-items-center mb-2">
+											<small class="text-muted">Scroll/pinch to zoom • Drag to pan</small>
+											<div>
+												<button type="button" class="btn btn-secondary btn-sm" id="resetZoomBtnInModal">
+													Reset
+												</button>
+											</div>
+										</div>
+										<canvas id="waveCanvasInModal" width="800" height="200" 
+												style="width: 100%; height: 100px; background: #f8f9fa; border-radius: 4px; cursor: crosshair;">
+										</canvas>
+										<div class="d-flex justify-content-between mt-2">
+											<small id="timeRangeInModal">Time range: 0 to 1 s</small>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div id="varsContainer" class="col">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="addVarBtn" class="btn btn-success">Add Variable</button>
+						<button id="setVariableDoneBtn" type="button" class="btn btn-success">Done</button>
+					</div>
+				</div>
+
+				<div id="adsrModal" class="modal-content main-modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">ADSR Envelope</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="input-group mb-3">
+							<span class="input-group-text">Attack</span>
+							<span class="input-group-text" id="attack-text">0.01s</span>
+							<input type="range" class="form-range" id="attack" value="0.01" min="0.01" max="2" step="0.01">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text">Decay</span>
+							<span class="input-group-text" id="decay-text">0.12s</span>
+							<input type="range" class="form-range" id="decay" value="0.12" min="0" max="1" step="0.01">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text">Sustain</span>
+							<span class="input-group-text" id="sustain-text">90%</span>
+							<input type="range" class="form-range" id="sustain" value="0.9" min="0" max="1" step="0.01">
+						</div>
+						<div class="input-group mb-3">
+							<span class="input-group-text">Release</span>
+							<span class="input-group-text" id="release-text">0.12s</span>
+							<input type="range" class="form-range" id="release" value="0.12" min="0.01" max="3" step="0.01">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+				<div id="imexModal" class="modal-content main-modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Import/Export Instruments</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body d-flex">
+						<div id="imexModalBtnContainer" class="d-flex flex-column gap-1 col-11 mx-auto justify-content-center">
+						  <button id="importBtn" class="btn btn-primary btn-lg w-100" type="button"><h1><i class="bi bi-box-arrow-in-down"></i> Import</h1></button>
+							<div id="import-text-container"></div>
+						  <button id="exportBtn" class="btn btn-primary btn-lg w-100" type="button"><h1><i class="bi bi-box-arrow-up"></i> Export</h1></button>
+							<div id="export-text-container"></div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+
+				<div id="downModal" class="modal-content main-modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Download Sound Sample (.wav file)</h1>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="input-group input-group-lg mb-3">
+							<div class="input-group">
+								<div class="input-group-text">
+									<input id="isDownloadAll" class="form-check-input mt-0" type="checkbox" value="" aria-label="checkbox for download all notes">
+								</div>
+								<span class="input-group-text">All notes (from C0 to C9)</span>
+								<div class="input-group-text">
+									<input id="isIgnoreADSR" class="form-check-input mt-0" type="checkbox" value="" aria-label="checkbox for ignoring adsr">
+								</div>
+								<span class="input-group-text">Ignore ADSR</span>
+							</div>
+						</div>
+						<div class="input-group input-group-lg mb-3">
+						  <span class="input-group-text">Frequency</span>
+						  <input id="downloadFrequency" type="number" min="0" max="20000" value="440" class="form-control" aria-label="frequency in hertz">
+						  <span class="input-group-text">Hz</span>
+						</div>
+						<div class="input-group input-group-lg">
+						  <span class="input-group-text">Duration</span>
+						  <input id="downloadDuration" type="number" min="0.001" max="60" value="3" class="form-control" aria-label="duration in second">
+						  <span class="input-group-text">s</span>
+						</div>
+						<div id="downloadProgress" class="progress mb-3 d-none" style="height: 20px;">
+							<div id="downloadProgressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+								role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+								<span id="downloadProgressText"></span>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button id="downloadBtn" type="button" class="btn btn-success">Download</button>
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Welcoming Modal -->
+		<div class="modal fade" id="welcomeModal" data-bs-keyboard="false" tabindex="-1">
+			<div class="modal-dialog modal-lg modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h1 class="modal-title fs-5">Welcome to the Math Synthesizer</h1>
+						<button type="button" class="btn-close btn-close-welcome-modal" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<h5>What is Math Synthesizer?</h5>
+						<p>
+							This app allows you to create and play custom waveforms using mathematical expressions in real-time.
+							You can also define variables, set ADSR envelopes, visualize the waveforms and export your creations as sound samples.
+						</p>
+						<h5>Quick Start</h5>
+						<p>
+							1. Click the <button class="btn btn-primary btn-sm"><i class="bi bi-play-circle-fill"></i> Turn On</button> button. <br>
+							2. Select an built-in instrument you like. <br>
+							3. Play notes with the piano keyboard via mouse, touch or computer keyboard. <br>
+							4. Adjust expression, variables, ADSR, volume, and pitch to customize your sound. <br>
+							5. Save and export your custom instruments as JSON file, or download samples as .wav file.
+						</p>
+						<h5>Complete Guide</h5>
+						<p>
+							For more information, please click <i class="bi bi-question-circle-fill help-btn"></i> next to the big title. <br>
+							<b>Enjoy making sound with math!🎵</b>
+						</p>
+						<h5>Links</h5>
+						<div class="row">
+							<div class="col-1 text-center">
+								<a href="https://github.com/InglandThiccLi" target="_blank"><img class="github" width="32px" height="32px" src="images/github-mark.svg" onerror="this.src='images/github-mark.png'" alt="View Source Code"></a>
+							</div>
+							<div class="col-2 text-center">
+								<a href='https://ko-fi.com/V7V31LFVQZ' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+							</div>         
+						</div>
+					</div>
+					<div class="modal-footer justify-content-between">
+						<div class="form-check">
+							<input class="form-check-input" type="checkbox" id="noShowCheckbox">
+							<label class="form-check-label" for="noShowCheckbox">
+								Don't show this again.
+							</label>
+						  </div>
+						<button type="button" class="btn btn-secondary btn-close-welcome-modal" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Help Modal -->
+		<div class="modal" id="helpModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+			<div class="modal-dialog modal-lg modal-fullscreen-md-down modal-dialog-centered modal-dialog-scrollable">
+				<div class="modal-content">
+					<!-- Main Modal Header -->
+					<div class="modal-header bg-primary text-white">
+						<h5 class="modal-title">Math Synthesizer Help Guide</h5>
+						<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					
+					<!-- Navigation Header - Fixed Horizontal Nav -->
+					<div class="modal-header border-bottom py-2 sticky-top">
+						<nav class="nav nav-pills w-100 flex-nowrap overflow-auto">
+							<a class="nav-link help-nav-item text-center active" data-section="general" href="#">
+								<i class="bi bi-info-circle me-1"></i> General
+							</a>
+							<a class="nav-link help-nav-item text-center" data-section="instrument" href="#">
+								<i class="bi bi-music-note-list"></i> Instrument
+							</a>
+							<a class="nav-link help-nav-item text-center" data-section="variables" href="#">
+								<i class="bi bi-alphabet"></i> Variables
+							</a>
+							<a class="nav-link help-nav-item text-center" data-section="adsr" href="#">
+								<i class="bi bi-sliders2"></i> ADSR
+							</a>
+							<a class="nav-link help-nav-item text-center" data-section="import-export" href="#">
+								<i class="bi bi-arrow-left-right me-1"></i> Im/Export
+							</a>
+							<a class="nav-link help-nav-item text-center" data-section="download" href="#">
+								<i class="bi bi-download me-1"></i> Download
+							</a>
+						</nav>
+					</div>
+					
+					<!-- Scrollable Content Area -->
+					<div class="modal-body">
+						<!-- General Section -->
+						<div class="help-section" id="general-section">
+							<h4 class="mb-3">General</h4>
+							<div class="help-content">
+								<h6>Preface</h6>
+								<p>
+									Welcome to the guide! Here, you will find detailed instructions 
+									on how to use each feature of the Math Synthesizer app.
+									Let's get started!
+								</p>
+
+								<h6>Quick Start</h6>
+								<ol>
+									<li>Click the <button class="btn btn-primary btn-sm"><i class="bi bi-play-circle-fill"></i> Turn On</button> button to activate the synthesizer.</li>
+									<li>Select a built-in instrument from the instrument list (or dropdown for mobile user).</li>
+									<li>Play notes using the piano keyboard with your computer keyboard, mouse, or touch.</li>
+								</ol>
+
+								<h6>Expression</h6>
+								<ol>
+									<li>The big input box at the top is where you enter the expression.</li>
+									<li>The expression defines the waveform of the sound.</li>
+									<li>
+										There are 3 predefined variables you can use in your expression:
+										<ul>
+											<li><span class="badge text-bg-secondary">t</span> represents time.</li>
+											<li><span class="badge text-bg-secondary">f</span> represents frequency <b>after</b> multiplying by 2π.</li>
+											<li><span class="badge text-bg-secondary">freq</span> represents frequency <b>before</b> multiplying by 2π.</li>
+										</ul>
+									</li>
+									<li>
+										There are 2 contants you can use in your expression: 
+										<span class="badge text-bg-secondary">e</span> and <span class="badge text-bg-secondary">pi</span> 
+									</li>
+									<li>
+										You can use anything provided by the <a href="https://www.w3schools.com/js/js_math_reference.asp" target="_blank">Math.js library</a> <b>WITHOUT</b> the Math prefix.<br>
+										<code>sin(f*t)</code>✔️ <code>Math.sin(f*t)</code>✖️
+									</li>
+									<li>
+										You can use custom variables in the expression. But you need to define them in the variable modal first. 
+									</li>
+									<li>
+										Expression with invalid syntax will be highlighted in red.
+									</li>
+									<li>
+										Having an <b>invalid syntax</b>, or containing any <b>undefined variable</b> will result in <b>no sound</b>.
+									</li>
+									<li>
+										Built-in instruments are served as examples for you to learn and experiment.
+									</li>
+								</ol>
+
+								<h6>Instrument List / Dropdown</h6>
+								<ol>
+									<li>
+										You can select an instrument from the horizontal instrument list (or dropdown for mobile user).
+									</li>
+									<li>
+										Selected instrument is highlighted.
+									</li>
+								</ol>
+
+								<h6>Function Buttons</h6>
+								<ol>
+									<li>
+										Each one opens a modal for you to adjust different settings:
+									</li>
+									<ul>
+										<li><button type="button" class="btn btn-success btn-sm"><i class="bi bi-music-note-list"></i></button> Instrument: Select or add custom instruments.</li>
+										<li><button type="button" class="btn btn-success btn-sm"><i class="bi bi-alphabet"></i></button> Variables: Define custom variables for your expression.</li>
+										<li><button type="button" class="btn btn-success btn-sm"><i class="bi bi-sliders2"></i></button> ADSR: Set the ADSR envelope for the sound.</li>
+										<li><button type="button" class="btn btn-success btn-sm"><i class="bi bi-arrow-left-right"></i></button> Import/Export: Import or export custom instruments as JSON files.</li>
+										<li><button type="button" class="btn btn-success btn-sm"><i class="bi bi-download"></i></button> Download: Download sound samples as .wav files.</li>
+									</ul>
+									<li>
+										Details for each modal can be found in different section of this guide.
+									</li>
+								</ol>
+
+								<h6>Settings</h6>
+								<ol>
+									<li>
+										Octave: Select the octave for the piano keyboard (0 to 6).
+									</li>
+									<li>
+										Volume: Adjust the overall volume (0% to 100%).
+									</li>
+									<li>
+										Pitch: Adjust the A4 pitch (415Hz to 466Hz).
+									</li>
+								</ol>
+
+								<h6>Waveform Visualizer</h6>
+								<ol>
+									<li>
+										Click the 
+										<button type="button" class="btn btn-success btn-sm"><i class="bi bi-soundwave"></i></button> 
+										button to toggle the waveform visualizer.
+									</li>
+									<li>
+										The visualizer displays the waveform based on the current expression and settings.
+									</li>
+									<li>
+										You can scroll/pinch to zoom and drag to pan the waveform.
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-secondary btn-sm">Reset</button> button to reset the zoom and pan.
+									</li>
+								</ol>
+							</div>
+						</div>
+						
+						<!-- Instrument Section -->
+						<div class="help-section d-none" id="instrument-section">
+							<h4 class="mb-3">Instrument</h4>
+							<div class="help-content">
+								<h6>Introduction</h6>
+								<p>
+									The Instrument Modal allows you to select from built-in instruments or add your custom instruments. 
+								</p>
+
+								<h6>Layout</h6>
+								<ol>
+									<li>
+										The first row shows the current instrument you select. 
+										When you modified the expression, variables, or ADSR, the current instrument will update accordingly,
+										and '(modified)' is shown next to the instrument name.
+										<ul>
+											<li>For example, Current Instrument: Sine</li>
+											<li>After modification, Current Instrument: Sine (modified)</li>
+										</ul>
+									</li>
+									<li>
+										On the right of the instrument name is a switch to show between built-in and custom instruments.
+									</li>
+									<li>
+										Instruments are listed in the main body. Click on an instrument to select it.
+									</li>
+									<li>
+										For custom instruments, the name becomes a input box, there will be a delete button and a save button on the right side of each instrument item.
+									</li>
+									<li>
+										At the bottom are two buttons: 
+										<ul>
+											<li><button type="button" class="btn btn-sm btn-primary">Add Instrument</button> Add new instrument on click.</li>
+											<li><button type="button" class="btn btn-sm btn-secondary">Close</button> Close the modal.</li>
+										</ul>
+									</li>
+								</ol>
+
+								<h6>Create Custom Instrument</h6>
+								<ol>
+									<li>
+										Select a built-in instrument to start with.
+									</li>
+									<li>
+										(Optional) Modify the expression, variables, and ADSR as you like.
+									</li>
+									<li>
+										In the instrument modal, click the <button type="button" class="btn btn-sm btn-primary">Add Instrument</button> button at the bottom to create a new custom instrument.
+									</li>
+									<li>
+										Gives a <b>unique</b> name to your new instrument in the input box. The name should only contain <b>letters, numbers, spaces, and hyphens</b>.
+									</li>
+								</ol>
+
+								<h6>Updating Custom Instrument</h6>
+								<ol>
+									<li>
+										Select a custom instrument from the list.
+									</li>
+									<li>
+										After modifying the expression, variables, or ADSR, click the save button 
+										<button type="button" class="btn btn-sm btn-success"><i class="bi bi-floppy"></i></button> 
+										on the right of the custom instrument item to save the changes.
+									</li>
+									<li>
+										Do <b>NOT</b> click the save button if you want to discard the changes. Simply select another instrument.
+									</li>
+									<li>
+										You may also rename the custom instrument by changing the text in the input box.	
+									</li>
+									<li>
+										Built-in instruments <b>CANNOT</b> be renamed or saved.
+									</li>
+								</ol>
+
+								<h6>Deleting Custom Instrument</h6>
+								<ol>
+									<li>
+										Click the delete button 
+										<button type="button" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></button> 
+										on the right of the custom instrument item, or clear the name in the input box to delete a custom instrument.
+									</li>
+									<li>
+										A confirmation dialog will appear. Click 'OK' to confirm deletion.
+									</li>
+									<li>
+										Built-in instruments <b>CANNOT</b> be deleted.
+									</li>
+									<li>
+										Deletion is <b>permanent</b> and <b>CANNOT</b> be undone.
+									</li>
+								</ol>
+							</div>
+						</div>
+						
+						<!-- Variables Section -->
+						<div class="help-section d-none" id="variables-section">
+							<h4 class="mb-3">Variables</h4>
+							<div class="help-content">
+								<h6>Introduction</h6>
+								<p>
+									The Variables Modal allows you to create custom variables for the expression. 
+								</p>
+
+								<h6>Layout</h6>
+								<ol>
+									<li>
+										Expression input box at the top to enter the expression.
+									</li>
+									<li>
+										A waveform visualizer button <button type="button" class="btn btn-success btn-sm"><i class="bi bi-soundwave"></i></button>
+										next to the expression input box to toggle the waveform visualizer.
+									</li>
+									<li>
+										Waveform visualizer area below the expression input box to display the waveform based on the current expression and variables.
+									</li>
+									<li>
+										The main body displays the list of defined variables. Each variable item contains:
+										<ul>
+											<li>Variable name input box.</li>
+											<li>Variable value input box.</li>
+										</ul>
+									</li>
+									<li>
+										At the bottom are two buttons: 
+										<ul>
+											<li><button type="button" class="btn btn-sm btn-success">Add Variable</button> Add new variable on click.</li>
+											<li><button type="button" class="btn btn-sm btn-success">Done</button> Save variables and close the modal.</li>
+										</ul>
+									</li>
+								</ol>
+
+								<h6>Adding New Variables</h6>
+								<ol>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-success">Add Variable</button> button at the bottom to create a new variable.
+									</li>
+									<li>
+										Gives a <b>unique</b> name to your new variable in the name input box. The name should <b>starts with letters</b> and contains only <b>letters, numbers, and underscores</b>.
+									</li>
+									<li>
+										Variables like <span class="badge text-bg-secondary">t</span>, <span class="badge text-bg-secondary">f</span>, <span class="badge text-bg-secondary">freq</span>, 
+										<a href="https://www.w3schools.com/Js/js_reserved.asp" target="_blank"> JavaScript reserved words</a>, and anything from 
+										<a href="https://www.w3schools.com/js/js_math_reference.asp" target="_blank">Math.js library</a> <b>CANNOT</b> be used as variable names.
+									</li>
+									<li>
+										Enter a numeric value <b>(from -999999 to 999999)</b> for the variable in the value input box. If it is left empty, the value defaults to 0.
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-success">Done</button> button to save the variables.
+									</li>
+									<li>
+										Now, you can use the defined variable in the expression.
+									</li>
+								</ol>
+
+								<h6>Editing Variables</h6>
+								<ol>
+									<li>
+										You can directly modify the name and value of existing variables in their respective input boxes.
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-success">Done</button> button to save changes.
+									</li>
+								</ol>
+
+								<h6>Deleting Variables</h6>
+								<ol>
+									<li>
+										Clear the name input box of a variable to delete a variable.
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-success">Done</button> button to save changes.
+									</li>
+								</ol>
+
+								<h6>Final Note</h6>
+								<ul>
+									<li>
+										Make sure to define <b>ALL</b> the variables you use in the expression, otherwise the sound will not play.
+									</li>
+									<li>
+										To discard the changes, close the modal and select another instrument without saving it.
+									</li>
+								</ul>
+							</div>
+						</div>
+						
+						<!-- ADSR Section -->
+						<div class="help-section d-none" id="adsr-section">
+							<h4 class="mb-3">ADSR Envelope</h4>
+							<div class="help-content">
+								<h6>Introduction</h6>
+								<p>
+									The ADSR Modal allows you to set the ADSR (Attack, Decay, Sustain, Release) envelope for the sound. 
+								</p>
+
+								<h6>Layout</h6>
+								<ol>
+									<li>
+										Four sliders for Attack, Decay, Sustain, and Release.
+									</li>
+									<li>
+										A <button type="button" class="btn btn-sm btn-secondary">Close</button> button to close the modal.
+									</li>
+								</ol>
+
+								<h6>Adjusting ADSR</h6>
+								<ol>
+									<li>
+										Simply drag the sliders to adjust the values of Attack, Decay, Sustain, and Release.
+									</li>
+									<li>
+										You don't need to click any save button, the changes are applied immediately.
+									</li>
+									<li>
+										To discard the changes, close the modal and select another instrument without saving it.
+									</li>
+								</ol>
+							</div>
+						</div>
+						
+						<!-- Import/Export Section -->
+						<div class="help-section d-none" id="import-export-section">
+							<h4 class="mb-3">Import and Export</h4>
+							<div class="help-content">
+								<h6>Introduction</h6>
+								<p>
+									The Import/Export Modal allows you to import or export custom instruments as JSON files.
+								</p>
+
+								<h6>Important Note</h6>
+								<p>
+									Unless you know the format of the JSON file, we do <b>NOT</b> recommend manually editing the JSON file because it may lead to invalid files that cannot be imported.
+								</p>
+
+								<h6>Layout</h6>
+								<ol>
+									<li>
+										A big <button type="button" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-in-down"></i> Import</button> button to import custom instruments from JSON files.
+									</li>
+									<li>
+										A big <button type="button" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-up"></i> Export</button> button to export your selected instrument as a JSON file.
+									</li>
+									<li>
+										A <button type="button" class="btn btn-sm btn-secondary">Close</button> button to close the modal.
+									</li>
+								</ol>
+
+								<h6>Import Instruments</h6>
+								<ol>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-in-down"></i> Import</button> button to open a file dialog.
+									</li>
+									<li>
+										Select <b>one or multiple</b> valid JSON files containing custom instrument data.
+									</li>
+									<li>
+										If the file is <b>valid</b> and the instrument does <b>NOT</b> exist in the app, the custom instruments will be added to your instrument list.
+									</li>
+								</ol>
+
+								<h6>Export Selected Instrument</h6>
+								<ol>
+									<li>
+										Select the instrument you want to export. Both built-in and custom instruments can be exported. 
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-primary"><i class="bi bi-box-arrow-up"></i> Export</button> button to download the instrument as a JSON file.
+									</li>
+								</ol>
+							</div>
+						</div>
+						
+						<!-- Download Section -->
+						<div class="help-section d-none" id="download-section">
+							<h4 class="mb-3">Download</h4>
+							<div class="help-content">
+								<h6>Introduction</h6>
+								<p>
+									The Download Modal allows you to download sound samples as .wav files.
+								</p>
+
+								<h6>Important Note</h6>
+								<ol>
+									<li>
+										Download will be in .zip format (contain the .wav files) if downloading all notes, otherwise a single .wav file.
+									</li>
+									<li>
+										Downloading all notes will generate sound samples for notes from C0 to C9, which may take a while. Reduce the duration or simplify the expression if necessary.
+									</li>
+								</ol>
+
+								<h6>Layout</h6>
+								<ol>
+									<li>
+										Checkboxes to select options for downloading all notes and ignoring ADSR.
+									</li>
+									<li>
+										Input boxes for frequency (in Hz) and duration (in seconds).
+									</li>
+									<li>
+										At the bottom are two buttons: 
+										<ul>
+											<li><button type="button" class="btn btn-sm btn-success">Download</button> Download sound samples on click.</li>
+											<li><button type="button" class="btn btn-sm btn-secondary">Close</button> Close the download modal.</li>
+										</ul>
+									</li>
+								</ol>
+
+								<h6>Downloading Sound Samples</h6>
+								<ol>
+									<li>
+										Select your desired options using the checkboxes.
+									</li>
+									<li>
+										Enter the frequency (from 0 to 20000 in Hz) and duration (from 0.01 to 60 in seconds) for the sound sample.
+									</li>
+									<li>
+										Values will be <b>clipped</b> or defaults to <b>440Hz,3s</b> if they are out of range.
+									</li>
+									<li>
+										Click the <button type="button" class="btn btn-sm btn-success">Download</button> button to start downloading.
+									</li>
+								</ol>
+							</div>
+						</div>
+					</div>
+					
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="support" class="position-absolute bottom-0 start-0 ms-2">
+		<div class='d-flex mb-2 gap-2'>
+			<div class="col text-center">
+				<a href="https://github.com/InglandThiccLi" target="_blank"><img class="github" width="40px" height="40px" src="images/github-mark.svg" onerror="this.src='images/github-mark.png'" alt="View Source Code"></a>
+			</div>
+			<div class="col text-center">
+				<a href='https://ko-fi.com/V7V31LFVQZ' target='_blank'><img height='40' style='border:0px;height:40px;' src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+			</div>         
+		</div>
+	</div>
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+	integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+	crossorigin="anonymous"></script>
+	<script src="scripts/core/globals.js"></script>
+	<script src="scripts/core/utilities.js"></script>
+	<script src="scripts/core/wave_visualizer.js"></script>
+
+	<script src="scripts/class/wave_visualizer.js"></script>
+	<script src="scripts/class/synth_processor.js"></script>
+	<script src="scripts/class/download_worker.js"></script>
+	
+	<script src="scripts/download/wav_converter.js"></script>
+	<script src="scripts/download/single_file_downloader.js"></script>
+	<script src="scripts/download/multi_file_downloader.js"></script>
+
+	<script src="scripts/modal/instruments.js"></script>
+	<script src="scripts/modal/variables.js"></script>
+	<script src="scripts/modal/adsr.js"></script>
+	<script src="scripts/modal/import_export.js"></script>
+	<script src="scripts/modal/download.js"></script>
+	<script src="scripts/modal/help_and_welcome.js"></script>
+
+	<script src="scripts/core/audio_manager.js"></script>
+	<script src="scripts/core/piano.js"></script>
+	<script src="scripts/core/events.js"></script>
+	
+	<script src="scripts/main.js"></script>
+</body>
+
+</html>

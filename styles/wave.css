@@ -1,0 +1,41 @@
+#waveVisualizerRow .card-body, #waveVisualizerRowInModal .card-body {
+    min-height: 250px; /* Ensure enough space for the canvas */
+	width: 100%;
+}
+
+#waveCanvas, #waveCanvasInModal {
+    touch-action: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    min-width: 100%;
+    min-height: 200px;
+}
+
+.wave-grid {
+    stroke: #e0e0e0;
+    stroke-width: 0.5;
+}
+
+.wave-axis {
+    stroke: #666;
+    stroke-width: 1.5;
+}
+
+.wave-line {
+    stroke: #007bff;
+    stroke-width: 2;
+    fill: none;
+}
+
+.wave-point {
+    fill: #007bff;
+    r: 3;
+}
+
+.wave-label {
+    font-size: 10px;
+    fill: #666;
+    text-anchor: middle;
+}

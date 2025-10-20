@@ -1,0 +1,140 @@
+body {
+    background: linear-gradient(135deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+    min-height: 100vh;
+    padding-top: 20px;
+    font-family: 'Quicksand', 'Georgia', 'Verdana', 'Arial';
+}
+
+body.test {
+    background: white;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+.controls {
+    gap: 8px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.error-input {
+    --bs-focus-ring-color: rgba(255,0,0,0.25);
+    border-color: red !important;
+}
+
+.success-text {
+	border-radius: 10px;
+	padding-left: 10px;
+	background-color: #198754;
+	color: white;
+}
+
+.warning-text {
+	border-radius: 10px;
+	padding-left: 10px;
+	background-color: #dc3545;
+	color: white;
+}
+
+.small-input {
+    max-width: 220px;
+}
+
+.form-check {
+    margin-bottom: 0;
+}
+
+.help-btn {
+    color: rgb(93, 138, 162)
+}
+
+.text-fade {
+    animation-name: fade;
+    animation-duration: 2s;
+	animation-delay: 3s;
+	animation-timing-function: ease-out;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+#title {
+    color: #2c3e50;
+}
+
+#varsDisplay {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+	margin-top: 0.4%;
+}
+
+#varsDisplay span {
+    display: inline-flex;
+    width: auto;
+    background: #fbe4f7;
+    padding: 2px;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin: 2px;
+}
+
+#instrumentList {
+    flex-wrap: nowrap;
+    align-items: center;
+    column-gap: 10px;
+    list-style-type: none;
+    padding-left: 0;
+    overflow-x: auto;
+}
+
+#instrumentList span {
+    margin-bottom: 5px;
+    padding: 5px;
+    background: #e8e9ea;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+#instrumentList span.active {
+    background: #82bfff;
+}
+
+#instrumentList span:hover {
+    background: #d9dcdf;
+}
+
+#volume, #pitch {
+    width: 50%;
+}
+
+#funcCol,
+#volCol,
+#pitCol,
+#waveCol,
+#octCol {
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#funcCol button {
+    font-size: 1rem;
+}
+
+#octCol .btn-group {
+    width: 80%;
+}
+
+#showPianoBtn {
+    width: 50%;
+}
