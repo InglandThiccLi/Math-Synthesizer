@@ -68,10 +68,9 @@
     align-items: center;
     justify-content: center;
     min-height: 48px;
-    gap: 1px;
-    border-radius: 10px;
-    width: 14%;
-    margin: calc(14%/16);
+    border-radius: 5px;
+    width: 16%;
+    margin: calc(16%/80);
 }
 
 .key.touch.active {
