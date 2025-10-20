@@ -1,7 +1,7 @@
 # Math Synthesizer
 A web-based synthesizer that generates sounds from mathematical expressions. Create unique instruments by writing mathematical formulas and explore the relationship between math and sound.
 
-Click HERE to start experimenting!
+Click [HERE](inglandthiccli.github.io/Math-Synthesizer/) to start experimenting!
 
 ## Features
 ### 🎹 Mathematical Sound Generation
